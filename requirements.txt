@@ -1,0 +1,12 @@
+# Minimal requirements inferred from nodes/*.py
+# Notes:
+# - `rclpy` is provided by ROS2 (often installed via system packages) but listed here for completeness.
+# - `openai-whisper` is the PyPI package that provides the `import whisper` module.
+# - `piper` may be installed from its project distribution; adjust if your environment uses a different package name.
+
+rclpy
+requests
+openai-whisper
+torch>=1.13
+onnxruntime
+piper
