@@ -1,59 +1,53 @@
-# voice_bot_docker
+# Voice Robot
 
-Lightweight voice-bot project packaged with a Dockerfile.
+Voice-controlled iRobot Create3 using wake word detection, speech recognition, and LLM intent parsing.
 
-This repository contains small node-like Python components for a voice bot (ASR, NLU, TTS, motion) and a packaged speech model used by the nodes.
+## Features
+- **Wake word**: Say "computer" to activate
+- **Movement**: "move forward 2 meters", "turn right 90 degrees"
+- **Follow mode**: "follow me" - robot follows you using camera
+- **Vision**: "describe your surroundings" - uses Gemini to describe what the robot sees
+- **Interrupt**: Say "computer" while moving to stop
 
-## Repository layout
+## Requirements
+- Raspberry Pi 5 with ROS2 Jazzy
+- iRobot Create3
+- USB webcam with microphone (e.g., Logitech C270)
+- Ollama running locally with `gemma3:1b` or larger
 
-- `Dockerfile` — Dockerfile to build an image for the project.
-- `models/` — pre-downloaded model files (e.g. `en_US-amy-medium.onnx` and its json).
-- `data/` — project data (audio samples, configs, etc.).
-- `nodes/` — Python node scripts:
-  - `asr_node.py` — automatic speech recognition node
-  - `nlu_node.py` — natural language understanding node
-  - `tts_node.py` — text-to-speech node
-  - `motion_node.py` — motion/actuator node
-
-## Purpose
-
-This repo is intended to run the voice-bot nodes either inside Docker or directly on the host for development.
-
-## Quick start — build the Docker image
-
-From the repository root (macOS / zsh):
+## Setup
 
 ```bash
-docker build -t voice-bot .
+# install dependencies
+sudo apt install espeak-ng pulseaudio-utils
+
+# create virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# install python packages
+pip install -r requirements.txt
+
+# copy and edit config
+cp .env.example .env
+nano .env  # Add API keys
 ```
 
-Run the container (example mounting the `models/` and `data/` folders so changes persist):
+
+## Run
 
 ```bash
-docker run --rm -it \
-  -v "$(pwd)/models:/app/models" \
-  -v "$(pwd)/data:/app/data" \
-  --name voice-bot \
-  voice-bot
+source /opt/ros/jazzy/setup.bash
+source .venv/bin/activate
+python main.py
 ```
 
-Adjust volumes/ports/env as needed for your container runtime.
-
-## Run nodes locally (for development)
-
-If you prefer to run node scripts directly on the host (recommended during development), ensure you have Python installed and the required packages available in your environment. From the repository root:
-
-```bash
-# run each node in a separate terminal
-python3 nodes/asr_node.py
-python3 nodes/nlu_node.py
-python3 nodes/tts_node.py
-python3 nodes/motion_node.py
-```
-
-Note: The repository currently includes model files in `models/`. If a node requires additional dependencies, install them in a virtualenv or use the Docker image.
-
-## Files of interest
-
-- `models/en_US-amy-medium.onnx` — ONNX model used by TTS/ASR nodes (already included).
-- `nodes/*.py` — node entrypoints.
+## Commands
+| Command | Action |
+|---------|--------|
+| "move forward X meters" | Move forward |
+| "turn left/right X degrees" | Turn in place |
+| "follow me" | Follow human using camera |
+| "describe your surroundings" | Describe what robot sees |
+| "stop" | Stop all movement |
+| "shut down" | Exit program |
